@@ -3,7 +3,7 @@ Comprehensive notes, visual breakdowns, and architectural patterns for frontend 
 
 # The RADIO Framework
 
-![Radio](RADIO.jfif)
+![Radio](RADIO.png)
 
 The **RADIO** framework is a simple, 5-step method to solve Frontend System Design problems during interviews or real projects[cite: 1, 6]. It helps you organize your thoughts before writing any code[cite: 1, 6].
 
@@ -39,7 +39,7 @@ Make your application fast, safe, and reliable[cite: 1, 6]:
 - **User experience (UX):** Optimistic updates (show the like button active immediately before the server responds)[cite: 1, 6].
 - **Error handling:** Show clear error messages, auto-retry failed requests, and secure the app against attacks like XSS[cite: 1, 6].
 
-![Radio](2.jfif)
+![Radio](2.png)
 ## Frontend vs Backend: System Design Comparison
 
 ![Frontend vs Backend](frontend-vs-backend.jpg)
@@ -63,7 +63,7 @@ When we talk about System Design, the frontend and backend have different goals 
 - **Components:** Design reusable, modular, and maintainable UI logic[cite: 8, 9].
 
  ### FaceBook System Design
-![Radio](3.jfif)
+![Radio](3.png)
 
 ## Case Study: Designing Facebook Feed
 
@@ -86,9 +86,9 @@ To see the difference in practice, here is how backend and frontend engineers lo
 - **User experience & accessibility:** Ensure smooth rendering, fast loading, and screen-reader support[cite: 10].
 
 
-![Radio](4.jfif)
+![Radio](4.png)
 
-![Radio](5.jfif)
+![Radio](5.png)
 
 ## Local Maximum vs. Better Decision (Org Value)
 
