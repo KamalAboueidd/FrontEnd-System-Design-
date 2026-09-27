@@ -142,3 +142,54 @@ Distinguishing between architectural decisions and design decisions protects the
 - **Calibrate Decision Weight:** It helps teams understand how seriously they must treat each choice before committing to it[cite: 16].
 - **Avoid Underestimating Architecture:** Prevents making hasty, unresearched choices on fundamental system structures that are painful and costly to rewrite later[cite: 14, 16].
 - **Avoid Overestimating Design:** Prevents "analysis paralysis" and time wasted debating small, tactical implementation details that can easily be changed at any time[cite: 14, 16].
+
+### RADIO System.. 1 ) Requirement Exploration 
+
+![ Requirement Exploration ](3.1.png)
+![ Requirement Exploration ](3.5.png)
+
+## Step 1: Requirement Exploration (R)
+
+The primary goal of Requirement Exploration is to **eliminate ambiguity by asking targeted, high-impact questions** before writing code or drafting an architectural diagram.
+![ Requirement Exploration ](3.2.png)
+
+### Dealing with Open-Ended Problems
+
+![ Requirement Exploration ](3.3.png)
+
+In a real-world project or system design interview, problem statements are often intentionally vague (e.g., *"Design an image feed"* or *"Build an autocomplete search component"*):
+- **Why interviewers do this:** They want to observe your thought process, see how you handle uncertainty, and verify that you don't make blind assumptions.
+- **Engineering mindset:** Jumping straight into component hierarchies or tech stacks is a red flag. Strong engineers pause, clarify the scope, establish hard boundaries, and align on expectations first.
+
+---
+
+### The Two Core Perspectives of Requirements
+
+Requirement exploration breaks down into two complementary directions:
+![ Requirement Exploration ](3.2.png)
+
+1. **Interview Problem (Technical Scope & Constraints):**
+   - Focuses on engineering limitations, scale, and environment boundaries.
+   - Clarifies supported devices (desktop vs. mobile web vs. hybrid), network conditions (offline-first vs. low latency), and volume targets (e.g., rendering thousands of items via virtualization instead of dumping everything into the DOM).
+
+2. **User Story (UX & Interaction Flow):**
+   - Focuses on user interactions and how data surfaces in the interface.
+   - Clarifies step-by-step user behavior: what triggers a search, whether input debouncing is required, how filtering functions, and how empty, error, or loading states appear.
+
+---
+
+### Functional vs. Non-Functional Requirements
+
+![ Requirement Exploration ](3.4.png)
+
+To structure questions effectively, group requirements into two distinct categories:
+
+| Category | Definition | Key Frontend Questions & Examples |
+| :--- | :--- | :--- |
+| **Functional Requirements** | What the system **must do** (features & user flows). | - What core actions can the user perform (read, create, edit, delete)?<br>- What are the primary UI states (loading, empty, success, error)?<br>- What data filters and sorting options are required? |
+| **Non-Functional Requirements** | How the system **must perform** (quality & constraints). | - **Performance:** What are the target Core Web Vitals (LCP, FID/INP, CLS) and initial load budgets?<br>- **Scalability:** How should the UI handle massive datasets (pagination, infinite scroll, windowing)?<br>- **Reliability & Offline:** Does the app need offline support or optimistic updates?<br>- **Accessibility & Devices:** Does it require keyboard navigation, screen reader support (ARIA), and cross-browser resilience? |
+
+
+## FaceBook Feed Ex.
+
+![ Requirement Exploration ](3.6.png)
