@@ -42,8 +42,6 @@ Make your application fast, safe, and reliable[cite: 1, 6]:
 ![Radio](2.png)
 ## Frontend vs Backend: System Design Comparison
 
-![Frontend vs Backend](frontend-vs-backend.jpg)
-
 When we talk about System Design, the frontend and backend have different goals and focus areas[cite: 8, 9]. The backend focuses on distributed systems and servers, while the frontend focuses on client-side architecture and user experience[cite: 8, 9].
 
 ### Backend: Distributed Systems (Focus: Data & Scale)
@@ -104,3 +102,43 @@ Sometimes engineers make decisions that are great for their own team, but not gr
   - Even if Option B is slightly harder for one team, it saves money, speeds up other teams, and improves the overall system.
 
 > **Key Rule:** A great senior engineer does not only optimize for their own comfort; they optimize for the whole organization.
+
+
+## Software Architecture: Definitions & Concepts
+
+### 1. What is Software Architecture? (4 Definitions)
+
+Software architecture has multiple perspectives depending on how you look at the system[cite: 7, 8]:
+
+![What is Software Architecture](2.1.png)
+
+1. **System Structure:** Software architecture is about the structure of a system[cite: 7, 13].
+2. **Early Critical Choices:** Architecture is the decisions you wish you could get right early in a project[cite: 8, 13].
+3. **Core Priorities:** Architecture is about the important stuff... whatever that is[cite: 9, 13].
+4. **Organizing for Quality:** Architecture is the set of significant design decisions about how the software is organized to promote desired quality attributes and properties[cite: 10, 13].
+
+---
+
+### 2. Architecture vs. Design
+
+Architecture and design are not completely separate things; they exist on a continuous spectrum from high-level vision to detailed execution[cite: 14, 15]:
+
+![Architecture vs Design](2.2.png)
+
+| Aspect | Architecture (High-Level) | Design (Low-Level) |
+| :--- | :--- | :--- |
+| **Questions Answered** | **What & Where** (Core modules and system boundaries)[cite: 14] | **Where & How** (Implementation details and patterns)[cite: 14] |
+| **Flexibility** | **Hard to change** (Expensive and time-consuming to alter later)[cite: 14] | **Easy to change** (Local refactoring and quick iterations)[cite: 14] |
+| **Planning Scope** | **Strategic planning** (Long-term system health and scalability)[cite: 14] | **Tactical planning** (Feature building and day-to-day coding)[cite: 14] |
+
+---
+
+### 3. Why Do We Need to Talk About This?
+
+Distinguishing between architectural decisions and design decisions protects the engineering team and the product[cite: 16]:
+
+![Why Design vs Architecture](2.4.png)
+
+- **Calibrate Decision Weight:** It helps teams understand how seriously they must treat each choice before committing to it[cite: 16].
+- **Avoid Underestimating Architecture:** Prevents making hasty, unresearched choices on fundamental system structures that are painful and costly to rewrite later[cite: 14, 16].
+- **Avoid Overestimating Design:** Prevents "analysis paralysis" and time wasted debating small, tactical implementation details that can easily be changed at any time[cite: 14, 16].
