@@ -193,3 +193,45 @@ To structure questions effectively, group requirements into two distinct categor
 ## FaceBook Feed Ex.
 
 ![ Requirement Exploration ](3.6.png)
+
+
+
+### RADIO System.. 2 ) Arc
+![ Requirement Exploration ](4.1.png)
+In this phase, our goal is to define the big picture of the system before writing any detailed code. We identify the core building blocks and show how data moves between them.
+
+---
+
+## 1. Core Concepts
+* **Component (Node / Box):** A modular building block in the system (e.g., UI Module, Global Store, Controller, or Network Layer).
+* **Dependency (Arrow / Edge):** Represents the relationship and direction of data flow between components (who triggers who, and where data comes from).
+
+---
+
+## 2. Steps to Follow
+![ Requirement Exploration ](4.2.png)
+
+### Step 1: Wireframe (UI Breakdown)
+* **Goal:** Understand the interface layout and identify the high-level UI sections.
+* **Breakdown Example:**
+  * Post Composer (creation area)
+  * Post Header (user info and timestamps)
+  * Post Content (text and media)
+  * Comments List & Comment Input
+
+![ Requirement Exploration ](4.3.png)
+### Step 2: Architecture Graph (Data Flow & Services)
+* **Goal:** Map the relationship between the UI, data storage, and the backend.
+* **Flow:**
+  * **User Action:** UI components (like `Post Composer` or `Comment Input`) send actions to the `Controller`.
+  * **Network Communication:** The `Controller` makes HTTP/WebSocket requests to the `Server`.
+  * **State Management:** Responses are stored in the `Store` (Server Cache / Global State).
+  * **Reactive UI:** Visual components subscribe to the `Store` and re-render with the latest data.
+
+---
+
+![ Requirement Exploration ](4.4.png)
+## 3. Best Practices to Keep in Mind
+* **Modularity:** Keep each component focused on a specific job with clear boundaries.
+* **Separation of Concerns:** Separate data fetching and state management from rendering UI.
+* **Server vs. Client Balance:** Decide early what computations belong on the client vs. what should be calculated on the backend.
