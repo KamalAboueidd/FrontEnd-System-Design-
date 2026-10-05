@@ -231,7 +231,50 @@ In this phase, our goal is to define the big picture of the system before writin
 ---
 
 ![ Requirement Exploration ](4.4.png)
+
 ## 3. Best Practices to Keep in Mind
 * **Modularity:** Keep each component focused on a specific job with clear boundaries.
 * **Separation of Concerns:** Separate data fetching and state management from rendering UI.
 * **Server vs. Client Balance:** Decide early what computations belong on the client vs. what should be calculated on the backend..
+
+# Phase 3: Data Model / Core Entities (D in RADIO)
+![ Requirement Exploration ](5.1.png)
+
+In this phase, we identify what data exists in our application, where it comes from, and where it lives on the client.
+
+---
+
+## 1. Data Classification by Source
+![ Requirement Exploration ](5.2.png)
+
+### 1. Server Originated Data
+* Data that comes directly from the backend database.
+* Accessed by multiple users or across multiple devices.
+* **Examples:** User profiles, feed posts, and comments.
+
+### 2. Client Only Data (State)
+* Data created and managed inside the client app.
+* Divided into two categories:
+  * **Persisted:** Created locally and then sent to the server (e.g., draft content for a new post).
+  * **Temp (Ephemeral):** Short-lived state that is never saved to a database (e.g., `isLoading`, `isExpanded`, modal toggles).
+
+---
+
+![ Requirement Exploration ](5.3.png)
+## 2. Core Entities Table
+
+| Source | Entity | Belongs to | Fields |
+| :--- | :--- | :--- | :--- |
+| **Client** | New Post | Composer | post content, media (image, video) |
+| **Server** | User | Store | id, username, profile_pic |
+| **Server** | Post | Store | id, date, content, media, comments |
+
+---
+
+![ Requirement Exploration ](5.4.png)
+![ Requirement Exploration ](5.5.png)
+## 3. Best Practices
+* **Use TypeScript:** Describe entities with clear TypeScript types or interfaces.
+* **Keep It Minimal:** Store only essential data; fewer state variables mean fewer bugs.
+* **Omit Derived State:** Never store values that can be computed from existing data (e.g., calculate `itemsCount` via `items.length`).
+* **Component Isolation:** Ensure component states stay encapsulated and do not interfere with each other.
