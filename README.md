@@ -196,7 +196,7 @@ To structure questions effectively, group requirements into two distinct categor
 
 
 
-### RADIO System.. 2 ) Arc
+### Architecture / High-Level Design (A in RADIO)
 ![ Requirement Exploration ](4.1.png)
 In this phase, our goal is to define the big picture of the system before writing any detailed code. We identify the core building blocks and show how data moves between them.
 
@@ -234,4 +234,4 @@ In this phase, our goal is to define the big picture of the system before writin
 ## 3. Best Practices to Keep in Mind
 * **Modularity:** Keep each component focused on a specific job with clear boundaries.
 * **Separation of Concerns:** Separate data fetching and state management from rendering UI.
-* **Server vs. Client Balance:** Decide early what computations belong on the client vs. what should be calculated on the backend.
+* **Server vs. Client Balance:** Decide early what computations belong on the client vs. what should be calculated on the backend..
