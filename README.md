@@ -278,3 +278,82 @@ In this phase, we identify what data exists in our application, where it comes f
 * **Keep It Minimal:** Store only essential data; fewer state variables mean fewer bugs.
 * **Omit Derived State:** Never store values that can be computed from existing data (e.g., calculate `itemsCount` via `items.length`).
 * **Component Isolation:** Ensure component states stay encapsulated and do not interfere with each other.
+
+# Phase 4: Interface & API Definition (I in RADIO)
+![ Application program interface](6.1.png)
+
+In this phase, we design the contracts (Interfaces) that allow different parts of our system to communicate. An API isn't just for communicating with a server; it also defines how components talk to each other.
+
+---
+
+## 1. Types of Interfaces
+
+### A. Client <=> Server (Network API)
+* Uses **HTTP Calls** (GET, POST, etc.) to request or send data to the backend.
+* **Inputs:** Request Method, Query Params, Path Params, and Request Body.
+* **Outputs:** HTTP Response (usually in JSON format).
+
+### B. Client <=> Client (Component API)
+* Uses **JS Functions, Events, and Props** to send data between UI components (like Parent to Child).
+* **Inputs:** Props & Function arguments.
+* **Outputs:** Rendered UI components or Returned function values.
+
+---
+
+## 2. The Three Pillars of any API
+
+![ Application program interface](6.2.png)
+
+1. **Functionality:** What does it do? (e.g., "Fetch the user's feed").
+2. **Parameters (Input):** What does it need? (e.g., limit, offset/cursor, or forms data).
+3. **Response (Output):** What does it return? (e.g., the requested data, error messages, or metadata).
+
+---
+
+## 3. Real-World Example: Paginated Feed API (`Client <=> Server`)
+ ![ Application program interface](6.3.png)
+ ![ Application program interface](6.4.png)
+ ![ Application program interface](6.5.png)
+When users scroll their feed, we use **Infinite Scrolling** with Pagination to fetch posts in chunks (small batches) so the app stays fast.
+
+### High-Level API Design
+
+* **Functionality:** Fetch the user's home feed posts (`GET /api/v1/feed`).
+* **Parameters (Inputs):**
+  * `size`: The number of posts to fetch (e.g., `10`).
+  * `next_cursor`: A string pointer to know where the next batch of posts starts (sent as `""` for the first request).
+
+* **Response (Output):**
+```json
+{
+  "pagination": {
+    "size": 10,
+    "next_cursor": "=dxNlcjpVMEC5VOZYTlo"
+  },
+  "results": [
+    {
+      "id": "123",
+      "author": {
+        "id": "456",
+        "name": "John Doe"
+      },
+      "content": "Hello world",
+      "image": "[https://www.example.com/feed-images.jpg](https://www.example.com/feed-images.jpg)",
+      "reactions": {
+        "likes": 20,
+        "haha": 15
+      },
+      "created_time": 1620639583
+    }
+    // ... More posts (up to 10)
+  ]
+}
+```
+ #### How the Pagination Flow Works:
+ - The client sends a request asking for 10 posts.
+
+ - The server responds with 10 posts and a token called next_cursor.
+
+ - As the user scrolls near the bottom of the feed, the client automatically triggers a new fetch.
+
+ - The client sends the next_cursor back to the server to get the next 10 posts, preventing any duplicate data or loading issues.
