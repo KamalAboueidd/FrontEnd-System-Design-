@@ -359,7 +359,7 @@ When users scroll their feed, we use **Infinite Scrolling** with Pagination to f
  - The client sends the next_cursor back to the server to get the next 10 posts, preventing any duplicate data or loading issues.
 
  # Phase 5: Optimizations & Deep Dive (O in RADIO)
-  ![Optmization and Deep Dive]()
+  ![Optmization and Deep Dive](7.1.png)
 In this final phase, we take our working system design and make it production-ready. We focus on scaling, performance, security, and real-world edge cases.
 
 ---
@@ -392,3 +392,4 @@ In this final phase, we take our working system design and make it production-re
 ## 2. Interview Strategy
 * **Follow the Lead:** Answer the interviewer's specific concerns first if they target a certain topic (e.g., performance or security).
 * **Drive with Strengths:** If given the floor, deep-dive into the areas most critical to the system (e.g., virtualization for a social feed, or caching for real-time dashboards).
+  ![Optmization and Deep Dive](7.2.png)
