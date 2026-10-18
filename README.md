@@ -392,3 +392,164 @@ In this final phase, we take our working system design and make it production-re
 ## 2. Interview Strategy
 * **Follow the Lead:** Answer the interviewer's specific concerns first if they target a certain topic (e.g., performance or security).
 * **Drive with Strengths:** If given the floor, deep-dive into the areas most critical to the system (e.g., virtualization for a social feed, or caching for real-time dashboards).
+
+# Component API Design Guide
+![Component API Guide](8.1.png)
+
+Working with frontend components can be a great experience or a daily headache, depending on how you design and maintain their APIs. A well-designed component API improves Developer Experience (DX), prevents bugs, and ensures long-term maintainability.
+
+---
+
+## Component API: Good vs Bad DX
+
+### Good Experience (Good DX)
+* **Works out of the box:** Works immediately with sensible default values without requiring complex setup.
+* **Behaves consistently:** Acts predictably and reliably everywhere across the entire app.
+* **Intuitive and clear API:** Uses familiar, standard names that developers can guess without checking docs.
+* **Highly customizable:** Flexible enough to adapt content and styling without breaking the component.
+* **Zero unexpected side effects:** Stays self-contained and never leaks styles or breaks outside layout.
+
+---
+
+### Bad Experience (Bad DX)
+* **Too many dependencies:** Relies on too many external packages that make the project heavy.
+* **Inconsistent behavior:** Changes how it works unexpectedly from one page to another.
+* **Confusing and overloaded API:** Uses strange prop names, conflicting flags, or too many props.
+* **Hard to customize:** Closed structure that forces you to edit the original component file for small changes.
+* **Unexpected side effects:** Causes layout shifts, breaks global scroll, or changes shared state silently.
+
+---
+
+## 1. Make Impossible States Impossible
+![Make Impossible States Impossible](8.2.png)
+
+Never let your component accept options that conflict with each other. If two states cannot exist together in real life, your component must make them impossible to use at the same time.
+
+### The Problem
+Using multiple boolean flags makes conflicting states possible, creating confusing behavior:
+
+```js
+// Bad DX: Conflicting props - which one wins?
+<Alert success warning>Data saved successfully</Alert>
+```
+
+### The Solution
+Replace multiple boolean props with a single prop that accepts specific values:
+
+```js
+// Good DX: Only one state can be selected at a time
+<Alert type="success">Data saved successfully</Alert>
+```
+
+---
+
+## 2. Less Is More (Avoid the "God Component")
+![Less Is More (Avoid the God Component)](8.3.png)
+
+Do not build a single giant component that tries to handle all data, permissions, and layout logic through dozens of props. When a component does too much, it becomes difficult to read, maintain, and test.
+
+### The Problem
+A bloated component with an endless list of props:
+
+```js
+// Bad DX: Hard to remember all props, rigid, and easy to break
+<UserProfileCard
+  name="John Doe"
+  showAvatar={true}
+  canEdit={true}
+  isLoading={false}
+  onEdit={handleEdit}
+/>
+```
+
+### The Solution
+Follow the Single Responsibility Principle and break the component down into smaller, composable pieces (Compound Components):
+
+```js
+// Good DX: Clean, modular, and easy to adjust
+<UserCard>
+  <UserCard.Avatar src="/avatar.png" />
+  <UserCard.Details name="John Doe" email="john@example.com" />
+  <UserCard.Actions>
+    <Button onClick={handleEdit}>Edit</Button>
+  </UserCard.Actions>
+</UserCard>
+```
+
+---
+
+## 3. Be Consistent
+![Be Consistent](8.4.png)
+
+Always use predictable and consistent names for props across all components in your project. When multiple components share the same function, their prop names must match.
+
+### The Problem
+Using different names for the exact same function confuses developers:
+
+```js
+// Bad DX: Different names for the disabled state
+<Button disabled={true}>Submit</Button>
+<Input enabled={false} placeholder="Enter name" />
+```
+
+### The Solution
+Standardize the prop name across your whole component library:
+
+```js
+// Good DX: Predictable and consistent everywhere
+<Button disabled={true}>Submit</Button>
+<Input disabled={true} placeholder="Enter name" />
+```
+
+---
+
+## 4. Use Types / Prop Validation
+![Use Types / Prop Validation](8.5.png)
+
+Even when using plain JavaScript, always validate the props your component accepts. Restricting values helps prevent silent bugs and annoying typos.
+
+### The Problem
+Allowing plain, open strings lets typos slip through unnoticed and breaks styling:
+
+```js
+// Bad DX: A simple typo silently breaks the layout
+<Alert type="dangar">Server error occurred</Alert>
+```
+
+### The Solution
+Define a clear list of allowed values to catch errors early:
+
+```js
+// Good DX: Explicit allowed values and safe fallbacks
+const ALLOWED_TYPES = ['info', 'success', 'warning', 'danger'];
+
+function Alert({ type = 'info', children }) {
+  const safeType = ALLOWED_TYPES.includes(type) ? type : 'info';
+  return <div className={`alert alert-${safeType}`}>{children}</div>;
+}
+```
+
+---
+
+## 5. Be Clear (Avoid Fancy Slang)
+![Be Clear (Avoid Fancy Slang)](8.6.png)
+
+Give your props explicit names that state exactly what they change. Clever or slang names might look fun at first, but they quickly create confusion for anyone else reading the code.
+
+### The Problem
+Vague, decorative names make it impossible to guess what the prop actually does:
+
+```js
+// Bad DX: What do 'fluffy' or 'slim' actually control?
+<Card fluffy />
+<Button slim />
+```
+
+### The Solution
+Use direct, self-explanatory names:
+
+```js
+// Good DX: Clear, direct, and self-explanatory
+<Card padding="large" />
+<Button noMargin={true} />
+```
