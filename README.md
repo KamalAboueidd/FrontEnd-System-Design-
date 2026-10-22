@@ -1,5 +1,17 @@
-# FrontEnd-System-Design-
-Comprehensive notes, visual breakdowns, and architectural patterns for frontend system design. Covers client-side architecture, core trade-offs, and practical frameworks to ace interviews and build scalable web applications.
+# Frontend System Design & Architecture
+
+![Language](https://img.shields.io/badge/Language-JavaScript-F7DF1E?logo=javascript&logoColor=black)
+![Field](https://img.shields.io/badge/Field-System%20Architecture-0052CC)
+![Topics](https://img.shields.io/badge/Topics-Frontend%20System%20Design-orange)
+![Status](https://img.shields.io/badge/Status-Active%20Learning%20%26%20Reference-brightgreen)
+
+Welcome to the **Frontend System Design & Architecture** reference repository! This repository contains structured study notes, visual breakdowns, architectural trade-offs, and practical frameworks designed for deep conceptual mastery and practical problem-solving across modern client-side architectures (**RADIO Framework**, **Performance Optimization**, **Rendering Strategies**, **Client-Side Caching**, and **Scalable Web Applications**).
+
+> **Author:** Kamal Aboueid  
+> **Topics:** Frontend System Design & System Architecture  
+> **Status:** Active Learning & Hands-on Reference
+
+---
 
 # The RADIO Framework
 
