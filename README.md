@@ -405,7 +405,7 @@ In this final phase, we take our working system design and make it production-re
 * **Follow the Lead:** Answer the interviewer's specific concerns first if they target a certain topic (e.g., performance or security).
 * **Drive with Strengths:** If given the floor, deep-dive into the areas most critical to the system (e.g., virtualization for a social feed, or caching for real-time dashboards).
 
-# Component API Design Guide
+# Component API Design & Styling Architecture
 ![Component API Guide](8.1.png)
 
 Working with frontend components can be a great experience or a daily headache, depending on how you design and maintain their APIs. A well-designed component API improves Developer Experience (DX), prevents bugs, and ensures long-term maintainability.
@@ -564,4 +564,308 @@ Use direct, self-explanatory names:
 // Good DX: Clear, direct, and self-explanatory
 <Card padding="large" />
 <Button noMargin={true} />
-```
+```
+
+---
+
+# Component Styling Architecture
+
+Styling is a core part of frontend architecture. A well-designed styling system makes components reusable and easy to customize without breaking application layout.
+
+---
+
+## 1. Architectural Forces & The Strategy Trade-off
+
+When designing a component styling system, four architectural forces balance against each other. Improving one force often requires a trade-off with another.
+
+### The 4 Core Architectural Forces
+
+1. **Flexibility (Handling Edge Cases):**
+   - **What it means:** How easily developers can adjust colors, spacing, or visual layout for special use cases.
+   - **Why it matters:** Real-world applications always have unique pages or edge cases that do not fit standard design defaults.
+
+2. **Consistency (System Integrity):**
+   - **What it means:** Enforcing unified design tokens (colors, typography, spacing) across all screens.
+   - **Why it matters:** Protects visual harmony and ensures the product feels cohesive and professional.
+
+3. **Predictability (Cascade & Specificity Safety):**
+   - **What it means:** Knowing exactly how a component will render without style collisions or cascade surprises.
+   - **Why it matters:** CSS is global by nature. If styles depend on class specificity tricks or file bundle order, unexpected visual bugs occur.
+
+4. **Scalability (Team & Codebase Growth):**
+   - **What it means:** Growing the component library and team without introducing style regressions or technical debt.
+   - **Why it matters:** As projects scale to hundreds of components and dozens of developers, fragile CSS leads to high maintenance costs.
+
+---
+
+### The Strategy Trade-Off: Global Theming vs. Per-Instance Customization
+
+Should styles be controlled strictly from a central system, or modified freely at each component instance?
+
+```
+Strict Design Rules <===============================> Maximum Customization
+[ Global Theming Only ]                             [ Per-Instance Overrides ]
+• High Consistency                                  • High Flexibility
+• Predictable & Safe                                • Risk of Style Drift
+• Slower for Edge Cases                             • Higher Complexity
+```
+
+* **Global Theming (Centralized Control):**
+  * **Mechanism:** Controls appearance using shared design tokens (such as CSS custom properties or theme objects).
+  * **When to choose:** Best for mature design systems, enterprise apps, and multi-brand platforms where brand consistency is non-negotiable.
+  * **Trade-off:** High consistency and predictability, but rigid when an engineer needs an isolated tweak for a one-off screen.
+
+* **Per-Instance Customization (Local Overrides):**
+  * **Mechanism:** Allows consumers to pass local overrides directly to components (via `className`, `style`, or custom hooks).
+  * **When to choose:** Best for fast-moving product teams, landing pages, or complex dashboard widgets with unique layout needs.
+  * **Trade-off:** Fast iteration and high flexibility, but increases the risk of "design drift" (inconsistent visual rules) and CSS conflicts.
+
+* **Key Decision Factors:**
+  * **Team Structure:** Central design system teams favor global theming; independent feature squads often demand per-instance escape hatches.
+  * **Design Maturity:** Early-stage products need flexibility to experiment; mature products enforce strict theme constraints.
+  * **Project Scope:** Multi-brand white-label applications require central theming; bespoke one-off marketing sites favor local customization.
+
+---
+
+## 2. Component Appearance Customization Patterns (Deep-Dive)
+
+There are four primary patterns for component appearance customization. Each pattern serves different architectural requirements.
+
+---
+
+### Pattern 1: Inline CSS (`style` prop)
+![Inline CSS Customization](inline.png)
+
+#### Concept
+Passing a JavaScript style object directly to the element's `style` attribute. Styles are applied directly to the DOM node.
+
+#### Example
+```jsx
+// Component implementation
+function Button({ style, children }) {
+  return (
+    <button className="btn-base" style={style}>
+      {children}
+    </button>
+  );
+}
+
+// Consumer usage
+<Button style={{ backgroundColor: '#2563eb', padding: '10px 20px' }}>
+  Save Changes
+</Button>
+```
+
+#### Use Cases
+- Dynamic values calculated at runtime by JavaScript (e.g., coordinates, progress bar percentage, drag-and-drop offsets).
+- Quick prototyping when writing dedicated classes is unnecessary.
+
+#### Pros & Cons
+* **Pros:**
+  * **Complete Flexibility:** Any valid CSS property can be applied immediately.
+  * **Immediate Override:** Inline styles have higher specificity than standard CSS classes.
+  * **Zero Class Collisions:** Styles attach directly to the DOM element without class name conflicts.
+* **Cons:**
+  * **CSS Wars:** Extremely difficult to override downstream without using `!important`.
+  * **No Pseudo-states or Media Queries:** Cannot handle `:hover`, `:focus`, `:active`, or `@media` responsive breakpoints.
+  * **Pollutes the DOM:** Inflates HTML size with repeated inline attributes.
+  * **Harms Maintainability:** Blends visual styling logic directly into application business logic.
+
+---
+
+### Pattern 2: Class Injection (`className` prop)
+![Class Injection Customization](injected.png)
+
+#### Concept
+Exposing a `className` prop on the component so consumers can pass external CSS classes or utility classes (e.g., Tailwind CSS) directly to the root element.
+
+#### Example
+```jsx
+// Component implementation
+function Card({ className = '', children }) {
+  return (
+    <div className={`card-root ${className}`.trim()}>
+      {children}
+    </div>
+  );
+}
+
+// Consumer usage (e.g., with utility classes)
+<Card className="rounded-xl shadow-lg bg-white p-6">
+  <h2>Order Details</h2>
+</Card>
+```
+
+#### The Non-Deterministic Styling Issue
+Passing classes seems simple, but it creates a classic CSS problem: **specificity conflicts determined by bundle order**.
+
+In CSS, if two classes have identical specificity (such as `.card-root` and `.custom-card`), the rule declared **later in the generated CSS bundle wins**—regardless of the order classes appear in the HTML `className` string.
+
+```css
+/* In bundle.css */
+.custom-card { background: red; }
+.card-root   { background: white; } /* card-root declared later! */
+```
+
+```jsx
+/* Even though custom-card is passed last, the background stays white! */
+<div className="card-root custom-card" />
+```
+
+If code-splitting or route changes alter the load order of stylesheets in production, components can suddenly change appearance without code changes.
+
+#### Use Cases
+- Integration with utility-first CSS frameworks (Tailwind CSS, UnoCSS).
+- Adjusting external layout properties (such as margins, flex grow, or grid placement) from a parent container.
+
+#### Pros & Cons
+* **Pros:**
+  * **Familiar & Standard:** The most common pattern in modern component libraries.
+  * **Utility-Friendly:** Works smoothly with utility systems and helper libraries like `clsx` or `tailwind-merge`.
+  * **Full CSS Capabilities:** Supports hover states, animations, and responsive queries.
+* **Cons:**
+  * **Non-Deterministic Cascade:** High risk of collision if passed classes override internally defined properties.
+  * **Leaky Abstraction:** Consumers can override core layout rules (like `display: flex`) and break internal component mechanics.
+
+---
+
+### Pattern 3: CSS Selector Hooks (Internal Classes & Data Attributes)
+![CSS Selector Hooks](hook.png)
+
+#### Concept
+Exposing predictable selector hooks inside multi-part components so external stylesheets can target nested elements without changing component code.
+
+#### DevTools Inspectability vs. Non-Deterministic Fragility
+When inspecting components using browser **DevTools (Inspect Element)**, class names make it simple to understand the DOM tree and locate nested elements. This inspectability makes internal classes tempting to target.
+
+However, relying on arbitrary internal classes (such as `.alert-box`, `.alert-title`) is a dangerous trap:
+1. **Non-Deterministic Cascade:** When external stylesheets target internal classes, specificity collisions can occur depending on which stylesheet loaded last.
+2. **Coupling to Implementation:** Arbitrary class names are private implementation details. If the component author refactors the internal HTML or renames a class, external styles silently break with zero warnings.
+
+#### The "Unless" Rule (Safe Contracts)
+Styling internal elements with classes is safe **ONLY IF** those classes are an officially documented, public API contract. The author guarantees that renaming or removing the class is treated as a breaking change.
+
+#### The Modern Solution: Stable Attribute Selectors (`data-*`)
+Instead of arbitrary class names, modern component architectures use **element attribute selectors** (like `data-slot`, `data-state`, and `data-loading`) as official styling hooks:
+- **Easy DevTools Inspection:** Attributes like `data-slot="title"` or `data-loading="true"` remain crystal-clear to read in browser DevTools.
+- **Stable Public Contract:** The attribute is a deliberate, documented hook. You can safely refactor internal HTML tags and internal classes without breaking consumer styling.
+- **Predictable State Hooks:** Directly maps UI states (e.g., `[data-state="open"]`, `[data-loading="true"]`) without fragile class toggling.
+
+#### Example
+```jsx
+// Component implementation with data attribute contracts
+function Alert({ state = 'open', loading = false, children }) {
+  return (
+    <div
+      className="alert-root"
+      data-slot="root"
+      data-state={state}
+      data-loading={loading}
+    >
+      <span data-slot="icon">🚨</span>
+      <div data-slot="content">{children}</div>
+    </div>
+  );
+}
+```
+
+```css
+/* External stylesheet targeting stable data-* contracts */
+[data-slot="root"] {
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+}
+
+[data-slot="root"][data-loading="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+[data-slot="icon"] {
+  margin-right: 8px;
+}
+
+[data-slot="content"] {
+  font-weight: 500;
+}
+```
+
+#### Use Cases
+- Multi-part compound components (Modals, Menus, Accordions, Tabs).
+- Headless UI component libraries (such as Radix UI, Ark UI, or Zag.js).
+
+#### Pros & Cons
+* **Pros:**
+  * **Clean DevTools Inspection:** Element states and slots are easy to identify in the Elements panel (`data-slot="icon"`, `data-loading="true"`).
+  * **Stable Semantic Contracts:** Component markup can be refactored internally without breaking consumer styling.
+  * **Separation of Concerns:** Clear boundary between internal structure and external theme rules.
+* **Cons:**
+  * **Requires Contextual Selectors:** Consumers must write attribute selectors (`[data-slot="..."]`), making single-line prop overrides harder.
+  * **Cascade Order:** Still susceptible to cascade order conflicts if styles are not properly scoped or layered.
+
+---
+
+### Pattern 4: CSS Preprocessor Compilation (Build-time Customization)
+![CSS Preprocessor Compilation](compile.png)
+
+#### Concept
+Customizing component styles at build time using preprocessor variables (such as Sass or Less) instead of runtime JavaScript or CSS overrides.
+
+#### The Mechanics (`!default` flag)
+The component library defines default values using the Sass `!default` flag:
+- The `!default` flag tells the compiler: *"Only set this value if the variable has not been defined yet."*
+- The consuming application defines its custom variables **before** importing the library stylesheet.
+
+#### Example
+```scss
+/* _button.scss (Component Library) */
+$btn-bg-primary: #0d6efd !default;
+$btn-radius: 4px !default;
+$btn-padding: 8px 16px !default;
+
+.btn-primary {
+  background-color: $btn-bg-primary;
+  border-radius: $btn-radius;
+  padding: $btn-padding;
+}
+```
+
+```scss
+/* main.scss (Consumer Application) */
+// 1. Define custom theme values first
+$btn-bg-primary: #10b981; // Brand green override
+$btn-radius: 9999px;      // Pill button override
+
+// 2. Import the component stylesheet second
+@import 'button';
+```
+
+#### Compiled Output
+```css
+/* Final bundle.css */
+.btn-primary {
+  background-color: #10b981;
+  border-radius: 9999px;
+  padding: 8px 16px;
+}
+```
+
+#### Use Cases
+- Large design system libraries (e.g., Bootstrap, Ant Design Sass/Less themes).
+- White-label products where different clients receive custom-branded CSS builds from the same codebase.
+
+#### Pros & Cons
+* **Pros:**
+  * **Lean CSS Bundle:** Only final compiled styles exist in the CSS file; zero redundant override rules.
+  * **High Build-Time Predictability:** Broken variables or syntax errors fail early during build time.
+  * **Zero Runtime Overhead:** No browser-side JavaScript or CSS-in-JS style recalculations.
+* **Cons:**
+  * **Requires a Build Step:** Cannot dynamically change values at runtime without switching whole stylesheets.
+  * **Difficult for Per-Instance Styling:** Variable changes affect all components globally; styling a single unique button requires extra utility classes.
+
+---
+
+### Pattern Summary
+
+![Component Styling Patterns Comparison](summary-table.png)
+
